@@ -31,7 +31,7 @@ export default function Dashboard() {
     }
   }, [user])
 
-  const { data: experiences, isLoading, error } = useQuery({
+  const experiencesQuery = useQuery({
     queryKey: ['experiences', searchQuery, filterRole],
     queryFn: async () => {
       try {
@@ -77,45 +77,10 @@ export default function Dashboard() {
     },
     retry: 2,
     retryDelay: 1000,
-    onError: (err: any) => {
-      console.error('Failed to load experiences:', err)
-      setHasError(true)
-      // Safely extract error message
-      let message = 'Failed to load experiences'
-      if (err instanceof Error) {
-        message = typeof err.message === 'string' ? err.message : String(err.message)
-      } else if (err?.message) {
-        message = typeof err.message === 'string' ? err.message : String(err.message)
-      } else if (err?.response?.data?._extractedMessage) {
-        message = err.response.data._extractedMessage
-      } else if (err?.response?.data?.detail) {
-        if (typeof err.response.data.detail === 'string') {
-          message = err.response.data.detail
-        } else if (Array.isArray(err.response.data.detail)) {
-          message = err.response.data.detail.map((e: any) => 
-            typeof e === 'string' ? e : e.msg || JSON.stringify(e)
-          ).join('. ')
-        }
-      }
-      
-      // Check if backend is actually running for network errors
-      if (message.includes('Network') || message.includes('Failed to fetch') || !err?.response) {
-        fetch('http://localhost:8000/health', { cache: 'no-cache' })
-          .then(res => {
-            if (res.ok) {
-              setErrorMessage('Connection issue. Please refresh the page (Ctrl + Shift + R)')
-            } else {
-              setErrorMessage('Unable to connect to server. Please check if the backend is running.')
-            }
-          })
-          .catch(() => {
-            setErrorMessage('Unable to connect to server. Please check if the backend is running.')
-          })
-      } else {
-        setErrorMessage(message)
-      }
-    },
   })
+
+  const { data: experiences = [] } = experiencesQuery
+  const { isLoading } = experiencesQuery
 
   // Major tech companies to prioritize
   const majorCompanies = ['Amazon', 'Google', 'Microsoft', 'IBM', 'Oracle', 'Accenture', 'Apple']
@@ -127,20 +92,20 @@ export default function Dashboard() {
       new Set(experiences.map((exp) => exp.company_name))
     ) : []).map((companyName) => {
     const companyExperiences = (experiences || []).filter(
-      (exp) => exp.company_name === companyName && exp.is_published
+      (exp: any) => exp.company_name === companyName && exp.is_published
     )
     return {
       name: companyName,
       experienceCount: companyExperiences.length,
       selectionRate: companyExperiences.length > 0
-        ? (companyExperiences.filter((e) => e.final_result === 'Selected').length /
+        ? (companyExperiences.filter((e: any) => e.final_result === 'Selected').length /
             companyExperiences.length) *
           100
         : 0,
       avgPackage: (() => {
-        const experiencesWithPackage = companyExperiences.filter((e) => e.package_offered)
+        const experiencesWithPackage = companyExperiences.filter((e: any) => e.package_offered)
         if (experiencesWithPackage.length === 0) return 0
-        return experiencesWithPackage.reduce((acc, e) => acc + (e.package_offered || 0), 0) / experiencesWithPackage.length
+        return experiencesWithPackage.reduce((acc: number, e: any) => acc + (e.package_offered || 0), 0) / experiencesWithPackage.length
       })(),
       isMajor: majorCompanies.some(mc => companyName.toLowerCase().includes(mc.toLowerCase())),
     }
@@ -187,10 +152,10 @@ export default function Dashboard() {
     )
   }
 
-  console.log('Dashboard render state:', { experiences, isLoading, error, companies: companies.length })
+  console.log('Dashboard render state:', { experiences, isLoading, error: experiencesQuery.error, companies: companies.length })
   
   // Safety check
-  if (!experiences && !isLoading && !error) {
+  if (!experiences && !isLoading && !experiencesQuery.error) {
     console.log('Showing loading state...')
     return (
       <div className="space-y-6">
@@ -303,7 +268,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {error ? (
+      {experiencesQuery.error ? (
         <div className="card text-center py-12 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
           <p className="text-red-600 dark:text-red-400 font-medium mb-2">
             Failed to load experiences
@@ -311,15 +276,16 @@ export default function Dashboard() {
           <p className="text-sm text-red-500 dark:text-red-500">
             {(() => {
               // Safely extract error message
+              const error = experiencesQuery.error as any
               if (error instanceof Error) {
                 return typeof error.message === 'string' ? error.message : String(error.message)
               }
-              if ((error as any)?.message) {
-                const msg = (error as any).message
+              if (error?.message) {
+                const msg = error.message
                 return typeof msg === 'string' ? msg : String(msg)
               }
-              if ((error as any)?.response?.data?._extractedMessage) {
-                return (error as any).response.data._extractedMessage
+              if (error?.response?.data?._extractedMessage) {
+                return error.response.data._extractedMessage
               }
               return 'Please check your connection and try again.'
             })()}

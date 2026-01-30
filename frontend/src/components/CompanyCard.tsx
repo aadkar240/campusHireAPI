@@ -1,18 +1,18 @@
 import { Link } from 'react-router-dom'
-import { Building2, DollarSign, TrendingUp, Sparkles, Code, Users, GraduationCap, UserCog, BarChart3, Briefcase } from 'lucide-react'
+import { Building2, DollarSign, TrendingUp, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 
-// Role icon mapping
-const getRoleIcon = (role: string) => {
-  const roleLower = role.toLowerCase()
-  if (roleLower.includes('sde') || roleLower.includes('software') || roleLower.includes('developer')) return Code
-  if (roleLower.includes('analyst') || roleLower.includes('data')) return BarChart3
-  if (roleLower.includes('manager') || roleLower.includes('product')) return UserCog
-  if (roleLower.includes('hr') || roleLower.includes('human')) return Users
-  if (roleLower.includes('intern')) return GraduationCap
-  return Briefcase
-}
+// Role icon mapping (commented out - not currently used)
+// const getRoleIcon = (role: string) => {
+//   const roleLower = role.toLowerCase()
+//   if (roleLower.includes('sde') || roleLower.includes('software') || roleLower.includes('developer')) return Code
+//   if (roleLower.includes('analyst') || roleLower.includes('data')) return BarChart3
+//   if (roleLower.includes('manager') || roleLower.includes('product')) return UserCog
+//   if (roleLower.includes('hr') || roleLower.includes('human')) return Users
+//   if (roleLower.includes('intern')) return GraduationCap
+//   return Briefcase
+// }
 
 interface CompanyCardProps {
   company: {

@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
-import { Home, User, PlusCircle, LogOut, Moon, Sun, Shield, Menu, X, ChevronDown, Building2, BookOpen, Users as UsersIcon, FileText, Facebook, Twitter, Linkedin, Instagram, Youtube, Phone, Mail } from 'lucide-react'
+import { Home, User, PlusCircle, LogOut, Moon, Sun, Shield, Menu, X, ChevronDown, Building2, Users as UsersIcon, FileText, Facebook, Twitter, Linkedin, Instagram, Youtube, Phone, Mail } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 interface LayoutProps {
