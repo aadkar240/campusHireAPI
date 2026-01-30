@@ -1,0 +1,46 @@
+# Render manifest for automatic provisioning. Replace placeholder values in the Render dashboard.
+# After you connect your GitHub repo, Render will create the services described below.
+
+services:
+  - type: web
+    name: campushire-backend
+    env: docker
+    repo: aadkar240/campusHireAPI
+    branch: main
+    dockerfilePath: backend/Dockerfile
+    autoDeploy: true
+    plan: free
+    region: oregon
+    # Run Alembic migrations automatically after deploy
+    releaseCommand: "cd backend && alembic upgrade head"
+    envVars:
+      - key: DATABASE_URL
+        scope: private
+      - key: SECRET_KEY
+        scope: private
+      - key: SMTP_HOST
+        scope: private
+      - key: SMTP_PORT
+        scope: private
+      - key: SMTP_USER
+        scope: private
+      - key: SMTP_PASSWORD
+        scope: private
+      - key: ADMIN_PASSWORD
+        scope: private
+      - key: FRONTEND_URL
+        scope: private
+      - key: OLLAMA_BASE_URL
+        scope: private
+
+databases:
+  - name: campushire-postgres
+    plan: starter
+    region: oregon
+    # Render will expose DATABASE_URL as an environment variable to services
+
+# Notes:
+# 1. After connecting the repo in Render, open the newly created Web service and
+#    go to the "Environment" tab to add secret values for the env vars declared above.
+# 2. If you prefer a different region, change `region` values.
+# 3. You can remove the `releaseCommand` if you want to run migrations manually.
